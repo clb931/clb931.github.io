@@ -1,0 +1,46 @@
+body {
+  background-color: #212121;
+  color: #212121;
+}
+
+.header .container {
+  background-color: #024959;
+}
+
+.header a {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 14px 10px;
+  text-transform: uppercase;
+}
+
+.header a:hover {
+  color: #037E8C;
+  text-decoration: none;
+}
+
+.banner {
+  height: 500px;
+  background-color: #037E8C;
+}
+
+.banner .container {
+  position: relative;
+  top: 100px;
+}
+
+.banner h1 {
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.banner p {
+  font-size: 20px;
+  color: white;
+}
+
+.footer {
+  background-color: #bdbdbd;
+}
