@@ -1,0 +1,37 @@
+.jumbotron {
+  background-image: url('http://www.dodge.com/images/gallery/2013/challenger/full/2013-Challenger-blackback-1.jpg');
+  height: 500px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.jumbotron .container {
+  position: relative;
+  top: 100px;
+}
+
+.jumbotron h1 {
+  color: white;
+  font-size: 48px;
+  font-family: 'Shift', sans-serif;
+  font-weight: bold;
+}
+
+.jumbotron p {
+  font-size: 20px;
+  color: white;
+}
+
+.learn-more {
+  background-color: #bdbdbd;
+}
+
+.learn-more h3 {
+  font-family: 'Shift', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.learn-more a {
+  color: #00b0ff;
+}

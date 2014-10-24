@@ -1,0 +1,40 @@
+body {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.jumbotron {
+  background-color: #037E8C;
+  color: white;
+}
+
+.textout {
+  background-color: #bdbdbd;
+  border: 1em solid #212121;
+  height: 600px;
+  padding: 1em;
+  overflow-y: scroll;
+  font-family: Courier;
+}
+
+p {
+  margin: auto;
+}
+
+.textArea {
+  background-color: #bdbdbd;
+  color: #212121;
+  height: 600px;
+  padding: 1em;
+  overflow-y: scroll;
+  font-family: Courier;
+}
+
+.lineNum {
+  overflow: hidden;
+}
+
+img {
+  width: 90%;
+  border: 2em solid #bdbdbd;
+}

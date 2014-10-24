@@ -1,0 +1,25 @@
+body {
+  background-color: #212121;
+}
+
+.nav .container {
+  background-color: #024959;
+  margin-bottom: 2em;
+}
+
+.nav a {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 14px 10px;
+  text-transform: uppercase;
+}
+
+.nav a:hover {
+  color: #037E8C;
+  text-decoration: none;
+}
+
+.nav li {
+  display: inline;
+}
