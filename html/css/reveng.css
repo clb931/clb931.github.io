@@ -3,38 +3,46 @@ body {
   background-size: cover;
 }
 
+p {
+  margin: auto;
+}
+
 .jumbotron {
   background-color: #037E8C;
   color: white;
 }
 
-.textout {
+img {
+  width: 90%;
+  border: 2em solid #bdbdbd;
   background-color: #bdbdbd;
-  border: 1em solid #212121;
-  height: 600px;
-  padding: 1em;
-  overflow-y: scroll;
-  font-family: Courier;
 }
 
-p {
-  margin: auto;
-}
-
-.textArea {
+.textArea, .lineNum {
   background-color: #bdbdbd;
   color: #212121;
   height: 600px;
   padding: 1em;
   overflow-y: scroll;
   font-family: Courier;
+  margin-bottom: 2em;
+  border: 2px solid #b5b5b5;
+}
+
+#hex {
+  width: 430px;
+}
+
+#ascii {
+  width: 180px;
+  word-break: break-all;
 }
 
 .lineNum {
   overflow: hidden;
+  width: 110px;
 }
 
-img {
-  width: 90%;
-  border: 2em solid #bdbdbd;
+.highlight {
+  background-color: yellow;
 }

@@ -1,6 +1,13 @@
+@import url(http://fonts.googleapis.com/css?family=Kotta+One|Donegal+One|Open+Sans:400italic,700,400);
+
 body {
   background-color: #212121;
   color: #212121;
+  font-family: 'Donegal One', sans-serif;
+}
+
+a {
+  font-family: 'Open Sans', sans-serif;
 }
 
 .header .container {
@@ -27,13 +34,14 @@ body {
 
 .banner .container {
   position: relative;
-  top: 100px;
+  top: 130px;
 }
 
 .banner h1 {
   color: white;
   font-size: 48px;
   font-weight: bold;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .banner p {
@@ -43,4 +51,8 @@ body {
 
 .footer {
   background-color: #bdbdbd;
+}
+
+.footer h3 {
+  font-family: 'Open Sans', sans-serif;
 }

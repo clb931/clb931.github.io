@@ -3,6 +3,7 @@
   width: 70%;
   margin: 2em 10% 2em 10%;
   padding: 1.5em 5% 1.5em 5%;
+  overflow: hidden;
 }
 
 .banner, .footer {
