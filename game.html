@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>LOTR RPG</title>
+		<link rel="stylesheet" href="css/stylesheet.css">
+		<link rel="stylesheet" href="plugins/jquery-ui-1.11.4/jquery-ui.css">
+	</head>
+	<body onload="Init();">
+		<div id="header">
+			<ul>
+				<li><a href="index.html">Home</a></li>
+				<li><a href="game.html">Game</a></li>
+				<li><a href="test.html">Test</a></li>
+				<div class="right">
+					<li><a href="">Sign Up</a></li>
+					<li><a href="">Login</a></li>
+				<div>
+			</ul>
+		</div>
+
+		<div id="frame">
+			<div class="left half">
+				<div id="tabber0" class="tabber">
+					<ul class="tab-hdr">
+						<li><a href="javascript:ActivateTab('tabber0', 'board_div')">Board</a></li>
+						<li><a href="javascript:ActivateTab('tabber0', 'map_div')">Map</a></li>
+						<li><a href="javascript:ActivateTab('tabber0', 'journal_div')">Journal</a></li>
+						<li><a href="javascript:ActivateTab('tabber0', 'character_sheet_div')">Character Sheet</a></li>
+					</ul>
+					<div id="board_div" class="tab container">
+					</div>
+					<div id="map_div" class="actv tab container">
+						<img id="map" src="res/game/map.jpg" alt="res/game/map.jpg">
+					</div>
+					<div id="character_sheet_div" class="tab container">
+						<h1>Character Sheet</h1>
+						<object id="character_sheet" data="AutomatedCharacterSheet.pdf" type="application/pdf">
+							<p>Alternative text - include a link <a href="AutomatedCharacterSheet.pdf">to the PDF!</a></p>
+						</object>
+					</div>
+					<div id="journal_div" class="tab container">
+						<h1>Journal</h1>
+						<textarea id="journal"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="right half">
+				<div id="chat">
+					<div id="chat_log"><div class="msg">Welcome</div></div>
+					<textarea id="chat_msg" class="nosize" autofocus></textarea>
+					<button id="chat_send">Send</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="plugins/jquery-ui-1.11.4/jquery-ui.js"></script>
+		<script src="plugins/jquery-panzoom/jquery.panzoom.js"></script>
+		<script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+		<script src="js/scripts.js"></script>
+		</body>
+</html>
