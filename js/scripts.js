@@ -3,10 +3,18 @@ var window_h = 0;
 
 function Init()
 {
+	$("body").widget({
+		type: "frame"
+	});
+	
+	$("#header").widget({
+		type: "header"
+	});
+
 	$(window).resize();
 	$("#frame").resize();
+	
 	console.log("Initialized");
-
 	Main();
 }
 
@@ -213,12 +221,12 @@ $(window).resize(function()
 	window_h = $(window).height();
 
 	$("#frame").height($(window).height() - $("#header").height());
-	$(".left.half").height($("#frame").height() - 7);
+	$(".left.half").height($("#frame").height() - 7 - 32);
 	$(".left.half").width($("#frame").width() * 2 / 3);
 	$(".right.half").width($("#frame").width() / 3 - 1);
 	$(".right.half").offset({
 		top:$("#header").height(),
-		left:$(".left.half").width()
+		left:$(".left.half").width() + 8
 	});
 
 	$("#frame").resize();
@@ -233,7 +241,8 @@ $("#frame").resize(function()
 		maxHeight:$("#frame").height(),
 		resize:function(event, ui){
 			var w = $(document).width() - ui.size.width;
-			$(".right.half").width(w - 1);
+			$(".right.half").width(w - 8);
+			$(".right.half").height($(".left.half").height());
 			$(".right.half").position({
 				top:$("#header").height(),
 				left:$(".left.half").width()

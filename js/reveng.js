@@ -1,3 +1,17 @@
+function Init()
+{
+  $("body").widget({
+    type: "frame"
+  });
+  
+  $("#header").widget({
+    type: "header"
+  });
+  
+  console.log("Initialized");
+  Main();
+}
+
 function padnum(num, pad)
 {
   return ((1e16 + num.toString(16).toUpperCase())).slice(-pad);
@@ -76,7 +90,7 @@ function handleFileSelect(evt)
   }
 }
 
-var main = function()
+var Main = function()
 {
   // Check for the various File API support.
   if (!window.File || !window.FileReader || !window.FileList || !window.Blob)
@@ -144,5 +158,3 @@ var main = function()
 
   document.getElementById('fileIn').addEventListener('change', handleFileSelect, false);
 };
-
-$(document).ready(main);
