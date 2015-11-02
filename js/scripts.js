@@ -13,6 +13,11 @@ function Init()
 
 	$(window).resize();
 	$("#frame").resize();
+
+	var div = document.createElement("div");
+	div.className ="msg info";
+	div.innerHTML = "Welcome<br>Type /r #d# to roll a dice<br>/r 1d6 will roll one six sided die.";
+	SendMsg(div);
 	
 	console.log("Initialized");
 	Main();
@@ -70,6 +75,7 @@ function SendChat(e)
 function SendMsg(div)
 {
 	document.getElementById("chat_log").appendChild(div);
+	document.getElementById("chat_log").innerHTML += "<br>";
 	document.getElementById("chat_log").scrollTop = document.getElementById("chat_log").scrollHeight;
 }
 
@@ -118,24 +124,20 @@ function ParseRoll(cmd)
 	var dice = Roll(count, sides);
 
 	var msg_div = document.createElement("div");
-	msg_div.className = "msg";
-
-	var roll_div = document.createElement("div");
-	roll_div.className = "roll";
-	msg_div.appendChild(roll_div);
+	msg_div.className = "msg roll";
 
 	var div = document.createElement("div");
 	div.className = "die " + GetDieCrit(dice[0], sides);
 	div.innerHTML = dice[0];
-	roll_div.appendChild(div);
+	msg_div.appendChild(div);
 
 	var total = dice[0];
 	for (var i = 1; i < dice.length; ++i) {
-		roll_div.innerHTML += "+";
+		msg_div.innerHTML += "+";
 		div = document.createElement("div");
 		div.className = "die " + GetDieCrit(dice[i], sides);
 		div.innerHTML = dice[i];
-		roll_div.appendChild(div);
+		msg_div.appendChild(div);
 
 		total += dice[i];
 	}
@@ -143,8 +145,8 @@ function ParseRoll(cmd)
 	div = document.createElement("div");
 	div.className = "die " + GetRollCrit(dice, sides);
 	div.innerHTML = total;
-	roll_div.innerHTML += "=";
-	roll_div.appendChild(div);
+	msg_div.innerHTML += "=";
+	msg_div.appendChild(div);
 
 	return msg_div;
 }
@@ -237,8 +239,8 @@ $("#frame").resize(function()
 	$(".left.half").resizable({
 		minWidth:$("#frame").width() / 3,
 		maxWidth:$("#frame").width() * 2 / 3,
-		minHeight:$("#frame").height(),
-		maxHeight:$("#frame").height(),
+		minHeight:$("#frame").height() - 7 - 32,
+		maxHeight:$("#frame").height() - 7 - 32,
 		resize:function(event, ui){
 			var w = $(document).width() - ui.size.width;
 			$(".right.half").width(w - 8);

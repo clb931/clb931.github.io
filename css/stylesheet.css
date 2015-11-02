@@ -111,8 +111,8 @@ img {
 }
 
 #chat_log {
-	color: black;
-	background-color: white;
+	color: #212121;
+	background-color: #DEDEDE;
 	overflow: auto;
 	margin-bottom: 1em;
 	width: 100%;
@@ -125,45 +125,73 @@ img {
 }
 
 .msg {
+	max-width: calc(100% - 1em);
 	padding: .5em;
-	width: 100%;
-	background-color: silver;
-	border-bottom: 1px solid black;
+	margin: .5em;
+	color: black;
+	background-color: white;
+	border-bottom: 3px solid;
+	border-right: 3px solid;
 	box-sizing: border-box;
+	border-radius:.5em;
+	word-wrap: break-word;
+	display: inline-block;
+}
+
+.msg.info {
+	color: #4F8A10;
+	background-color: #DFF2BF;
+}
+
+.msg.warning {
+	color: #9F6000;
+	background-color: #FEEFB3;
 }
 
 .msg.err {
-	color: white;
-	background-color: #660000;
+	color: #D8000C;
+	background-color: #FFBABA;
+}
+
+.msg.roll {
+	color: #00529B;
+	background-color: #BDE5F8;
 }
 
 .roll {
 	padding: .5em;
-	width: auto;
-	background-color: white;
 	display: inline-block;
 }
 
 .die {
-	margin: .2em;
+	margin: .3em;
 	width: 2em;
+	color: black;
 	background-color: white;
 	border: 3px solid black;
 	display: inline-block;
 	text-align: center;
+	vertical-align: middle;
+	border-radius:.5em;
 }
 
 .die.fail {
-	border-color: #FF0000;
+	color: #D8000C;
+	background-color: #FFBABA;
 }
 
 .die.crit {
-	border-color: #00DD00;
+	color: #4F8A10;
+	background-color: #DFF2BF;
 }
 
 .die.both {
-	border-color: #0000FF;
+	color: #9F6000;
+	background-color: #FEEFB3;
 }
+
+
+
 
 .jumbotron {
 	background-color: #037E8C;
