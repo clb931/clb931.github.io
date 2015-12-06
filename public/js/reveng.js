@@ -1,17 +1,3 @@
-function Init()
-{
-  $("body").widget({
-    type: "frame"
-  });
-  
-  $("#header").widget({
-    type: "header"
-  });
-  
-  console.log("Initialized");
-  Main();
-}
-
 function padnum(num, pad)
 {
   return ((1e16 + num.toString(16).toUpperCase())).slice(-pad);

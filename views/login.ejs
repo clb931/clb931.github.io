@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Login - Caleb French</title>
+		<link rel="stylesheet" href="css/stylesheet.css">
+		<link rel="stylesheet" href="js/cmf/css/cmf.css">
+	</head>
+	<body onload="Init();">
+		<div id="header">
+			<ul>
+				<li><a href="/">Home</a></li>
+				<li><a href="/hex">Hex</a></li>
+				<li><a href="/game">Game</a></li>
+				<li><a href="/contact">Contact</a></li>
+			</ul>
+		</div>
+
+		<div id="frame">
+			<table align="center"> <tbody> <tr> <td>
+				<!-- show any messages that come back with authentication -->
+				<% if (message.length > 0) { %>
+					<div class="msg err"><%= message %></div>
+				<% } %>
+
+				<form action="/login" method="post">
+					<table>
+						<caption>Login</caption>
+						<tbody>
+							<tr><td><label>Email</label></td> <td><input type="text" name="email"></td></tr>
+							<tr><td><label>Password</label></td> <td><input type="password" name="password"></td></tr>
+							<tr><td><button type="submit">Login</button></td> <td><p>Need an account? <a href="/signup">Signup</a></p></td></tr>
+						</tbody>
+					</table>
+				</form>
+			</td> </tr> </tbody> </table>
+		</div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="js/cmf/cmf.js"></script>
+		<script src="js/cmf/Widget.js"></script>
+		<script src="js/scripts.js"></script>
+	</body>
+</html>

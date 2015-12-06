@@ -3,22 +3,22 @@
 	<head>
 		<title>RevEng - Caleb French</title>
 		<link rel="stylesheet" href="css/stylesheet.css">
-		<link rel="stylesheet" href="plugins/jquery-cmf/css/cmf.css">
+		<link rel="stylesheet" href="js/cmf/css/cmf.css">
 	</head>
 	<body onload="Init();">
 		<div id="header">
 			<ul>
-				<li><a href="index.html">Home</a></li>
-				<li><a href="">Hex</a></li>
-				<li><a href="game.html">Game</a></li>
-				<li><a href="contact.html">Contact</a></li>
+				<li><a href="/">Home</a></li>
+				<li><a href="/hex">Hex</a></li>
+				<li><a href="/game">Game</a></li>
+				<li><a href="/contact">Contact</a></li>
 			</ul>
 		</div>
 
 		<div id="frame">
 			<div class="jumbotron">
-				<input class="" id="fileIn" type="file"/>
-				<h3 class="" id="fileName">No File Selected...</h3>
+				<input id="fileIn" type="file"/>
+				<h3 id="fileName">No File Selected...</h3>
 			</div>
 
 			<div class="cont1">
@@ -36,8 +36,9 @@
 		</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script src="plugins/jquery-cmf/js/cmf.js"></script>
+		<script src="js/cmf/cmf.js"></script>
+		<script src="js/cmf/Widget.js"></script>
+		<script src="js/scripts.js"></script>
 		<script src="js/reveng.js"></script>
 	</body>
-
 </html>
