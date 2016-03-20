@@ -13,11 +13,11 @@ var express			= require("express"),
 	mongoStore		= require("connect-mongo")(session),
 	clc				= require("cli-color");
 
-var port				= process.env.PORT || 80,
-	error				= clc.red.bold,
-	warn				= clc.yellow,
-	info				= clc.greenBright,
-	notice				= clc.cyanBright,
+var port			= process.env.PORT || 80,
+	error			= clc.red.bold,
+	warn			= clc.yellow,
+	info			= clc.greenBright,
+	notice			= clc.cyanBright,
 	session;
 
 
