@@ -1,3 +1,8 @@
+var socket,
+	cmds,
+	macros = {},
+	macro_rows = {};
+
 function InitGame()
 {
 	$(window).resize(function()
@@ -60,8 +65,95 @@ function InitGame()
 		});
 	});
 
-	_$("#chat").TableChatElement();
-	_$("#journal").RichTextElement();
+	socket = io();
+	cmds = _$("#chat").TableChatElement({
+		socket: socket,
+	});
+
+	_$("#journal").RichTextElement({
+		onSave: OnJournalSave,
+		socket: socket,
+	});
+
+	_$("#macro_save_btn").on("click", function(evt) {
+		var name = _$("#macro_edit_name");
+		var editor = _$("#macro_editor");
+
+		if (name.value() == "")
+			return;
+
+		AddMacro(name.value(), editor.value());
+		socket.emit("user-save-macro", { 
+			name:	name.value(),
+			value:	macros[name.value()],
+			remove:	false,
+		});
+
+		name.value("");
+		editor.value("");
+	});
+
+	socket.on("user-load-s2c", function(packet) {
+		console.log("Loading journal.");
+		var journal = _$("#journal");
+		journal.select("textarea").value(packet.journal);
+		journal.select("button", 1).fire("click");
+		console.log("Loading macros.");
+		for (key in packet.macros)
+			if (packet.macros.hasOwnProperty(key))
+				AddMacro(key, packet.macros[key]);
+	});
+}
+
+function AddMacro(name, value) {
+		if (macros.hasOwnProperty(name)) {
+			macros[name] = value;
+			return;
+		}
+
+		macros[name] = value;
+		var edit_btn = cmf.create("button")
+			.text("Edit")
+			.on("click", function(evt) {
+				_$("#macro_edit_name").value(name);
+				_$("#macro_editor").value(macros[name]);
+			});
+		var rm_btn = cmf.create("button")
+			.text("Remove")
+			.on("click", function(evt) {
+				socket.emit("user-save-macro", { 
+					name:	name,
+					value:	macros[name],
+					remove:	true,
+				});
+				macro_rows[name].remove();
+				delete macro_rows[name];
+				delete macros[name];
+			});
+		var exe_btn = cmf.create("button")
+			.text("Execute")
+			.on("click", function(evt) {
+				cmds["batch"].action(macros[name]);
+			});
+		var col1 = cmf.create("td")
+			.text(name);
+		var col2 = cmf.create("td")
+			.append(edit_btn);
+		var col3 = cmf.create("td")
+			.append(rm_btn);
+		var col4 = cmf.create("td")
+			.append(exe_btn);
+		macro_rows[name] = cmf.create("tr")
+			.append(col1)
+			.append(col2)
+			.append(col3)
+			.append(col4);
+		_$("#macro_list").append(macro_rows[name]);
+}
+
+function OnJournalSave(evt) {
+	socket.emit("user-save-journal", 
+		_$("#journal").select("textarea").value());
 }
 
 function ActivateTab(tabCtrl, tabId)

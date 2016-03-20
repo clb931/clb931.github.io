@@ -1,45 +1,29 @@
 (function(_$) {
 	_$.fn.RichTextElement = function(options) {
 		var settings = _$.extend({
-			
+			socket: null,
+			onSave: null,
 		}, options);
+		
+		var socket = settings.socket || io();
 
 		var edit_btn = _$.create("button", {
 			text: "Edit",
 		});
 		this.append(edit_btn);
+
 		var save_btn = _$.create("button", {
 			text: "Save",
 			disabled: true,
 		});
 		this.append(save_btn);
+
 		var text_area = _$.create("textarea", {
 			className:	"cmf_richtextarea",
 			style:		"display: none",
 		});
-		text_area.value("#h1\n"+
-						"##h2\n"+
-						"###h3\n"+
-						"####h4\n"+
-						"#####h5\n"+
-						"######h6\n"+
-						"_\n"+
-						">blockquote\n"+
-						"[google](http://www.google.com)\n"+
-						"~~strike~~\n"+
-						"**bold**\n"+
-						"*italic*\n"+
-						"_\n"+
-						"* ul 01\n"+
-						"* ul 02\n"+
-						"* ul 03\n\n"+
-						"- ul 11\n"+
-						"- ul 12\n"+
-						"- ul 13\n\n"+
-						"1. ol 1\n"+
-						"2. ol 2\n"+
-						"3. ol 3");
 		this.append(text_area);
+
 		var text_view = _$.create("iframe", {
 			className: "cmf_richtextarea",
 		});
@@ -66,6 +50,8 @@
 			text_view.html("");
 			ibody.innerHTML = ParseString(text_area.value()).html();
 		});
+		if (settings.onSave)
+			save_btn.on("click", settings.onSave);
 
 		function ParseString(str) {
 			return ParseParagraphs(_$.create("div"), str.split("\n\n"));
@@ -230,4 +216,25 @@
 	};
 }(cmf));
 
-// (\#\#\#\#\#\#\w*|\#\#\#\#\#\w*|\#\#\#\#\w*|\#\#\#\w*|\#\#\w*|\#\w*|\>\w*|\*\*\w*\*\*|\*\w*\*|[\*\-] \w*|\d\. \w*)
+// "#h1\n"+
+// "##h2\n"+
+// "###h3\n"+
+// "####h4\n"+
+// "#####h5\n"+
+// "######h6\n"+
+// "_\n"+
+// ">blockquote\n"+
+// "[google](http://www.google.com)\n"+
+// "~~strike~~\n"+
+// "**bold**\n"+
+// "*italic*\n"+
+// "_\n"+
+// "* ul 01\n"+
+// "* ul 02\n"+
+// "* ul 03\n\n"+
+// "- ul 11\n"+
+// "- ul 12\n"+
+// "- ul 13\n\n"+
+// "1. ol 1\n"+
+// "2. ol 2\n"+
+// "3. ol 3"

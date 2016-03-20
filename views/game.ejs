@@ -34,21 +34,48 @@
 						<li><a href="javascript:ActivateTab('tabber0', 'map_div')">Map</a></li>
 						<li><a href="javascript:ActivateTab('tabber0', 'journal_div')">Journal</a></li>
 						<li><a href="javascript:ActivateTab('tabber0', 'character_sheet_div')">Character Sheet</a></li>
+						<li><a href="javascript:ActivateTab('tabber0', 'macro_div')">Macros</a></li>
 					</ul>
 					<div id="board_div" class="tab container">
+						<h1>Board</h1>
+						<div id="board"></div>
 					</div>
 					<div id="map_div" class="actv tab container">
-						<img id="map" src="res/game/map.jpg" alt="res/game/map.jpg">
-					</div>
-					<div id="character_sheet_div" class="tab container">
-						<h1>Character Sheet</h1>
-						<object id="character_sheet" data="res/game/AutomatedCharacterSheet.pdf" type="application/pdf">
-							<p>Alternative text - include a <a href="res/game/AutomatedCharacterSheet.pdf">link</a> to the PDF!</p>
-						</object>
+						<h1>Map</h1>
+						<div style="with:100%;height:90%;">
+							<img id="map" src="res/game/map.jpg" alt="res/game/map.jpg">
+						</div>
 					</div>
 					<div id="journal_div" class="tab container">
 						<h1>Journal</h1>
 						<div id="journal"></div>
+					</div>
+					<div id="character_sheet_div" class="tab container">
+						<h1>Character Sheet</h1>
+						<object id="character_sheet" data="res/game/AutomatedCharacterSheet.pdf" type="application/pdf">
+							<p><a href="res/game/AutomatedCharacterSheet.pdf">link</a> to the PDF</p>
+						</object>
+					</div>
+					<div id="macro_div" class="tab container">
+						<h1>Macros</h1>
+						<div id="macros">
+							<table>
+								<tbody>
+									<tr>
+										<td><label>Name</label></td>
+										<td><input type="text" id="macro_edit_name"></td>
+									</tr>
+									<tr>
+										<td><button id="macro_save_btn">Save</button></td>
+										<td><textarea id="macro_editor"></textarea></td>
+									</tr>
+								</tbody>
+							</table>
+							
+							<table>
+								<tbody id="macro_list"></tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -69,7 +96,4 @@
 		<script src="js/scripts.js"></script>
 		<script src="js/game.js"></script>
 	</body>
-
-	<template id="cmf_table_t"><table class="cmf_roll_template" align="center"><caption></caption><tbody></tbody></table></template>
-	<template id="cmf_row_t"><tr><td id="c1"></td><td id="c2"></td></tr></template>
 </html>

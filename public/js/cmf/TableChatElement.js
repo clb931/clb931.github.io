@@ -1,7 +1,7 @@
 (function(_$) {
 	_$.fn.TableChatElement = function(options) {
 		var settings = _$.extend({
-
+			socket: null,
 		}, options);
 		
 		var user = {
@@ -15,20 +15,234 @@
 			},
 			players = {},
 			connected = false,
-			socket = io();
+			socket = settings.socket || io();
 
-		this.addClass(".cmf_chat");
+		var commands = {
+			"calc": {
+				action: function(args) {
+					var msg = args.join(' ');
+					Broadcast(msg + " = " + cmf.MathParser(msg), "cmf-tce-roll");
+				},
+				description:	"/calc $exp<br>"+
+								"  Calculates the results of a<br>"+
+								"  mathmatical expression.<br>",
+				help_text:		"$exp - A mathmatical expression<br>"+
+								"  to performe.<br>"+
+								"Example:<br>"+
+								"  /calc ((2 + 2) * 5) / 3<br>"+
+								"Note:<br>"+
+								"  Does not support math with<br>"+
+								"  floating point numbers. This<br>"+
+								"  means any number containing a<br>"+
+								"  decimal.",
+			},
+			"clear": {
+				action: function(args) {
+					chat_log.html("");
+				},
+				description:	"/clear<br>"+
+								"  Clears the chat log.<br>",
+				help_text:		"",
+			},
+			"batch": {
+				action: function(args) {
+					var batch_list = args.split(';');
+					for (var i = 0; i < batch_list.length; ++i) {
+						var cmd_args = batch_list[i].split(' ');
+						var cmd = cmd_args.shift();
+						while (cmd[0] == " " || cmd[0] == "\t" ||
+							cmd[0] == "\n" || cmd[0] == "\/")
+							cmd = cmd.slice(1);
+						if (cmd.length != 0)
+							commands[cmd].action(cmd_args);
+					}
+				},
+				description:	"/batch $cmd1; $cmd2; ...<br>"+
+								"  Executes a batch of \';\'<br>"+
+								"  seperated commands<br>",
+				help_text:		"$cmd#:<br>"+
+								"  The command to be executed<br>"+
+								"Example:<br>"+
+								"  /batch /roll 2d6; /msg hello;<br>",
+			},
+			"help": {
+				action: function(args) {
+					DisplayHelp(args);
+				},
+				description:	"/help $cmd<br>"+
+								"  Displays the help text for<br>"+
+								"  commands.<br>",
+				help_text:		"$cmd:<br>"+
+								"  The command to display the<br>"+
+								"  help text of.<br>"+
+								"Example:<br>"+
+								"  /help template<br>"+
+								"Note:<br>"+
+								"  If $cmd is not given the<br>"+
+								"  general help text is displayed<br>",
+			},
+			"msg": {
+				action: function(args) {
+					Broadcast(args.join(' '), "cmf-tce-text");
+				},
+				description:	"/msg $msg<br>"+
+								"  Sends a message to all users.<br>",
+				help_text:		"$msg:<br>"+
+								"  The message to send.<br>"+
+								"Example:<br>"+
+								"  /msg Hello everyone!<br>"+
+								"Note:<br>"+
+								"  It is not necessary to type<br>"+
+								"  /msg to send a message. This<br>"+
+								"  command is only useful for<br>"+
+								"  macros.",
+			},
+			"reply": {
+				action: function(args) {
+					Reply(args.join(' '));
+				},
+				description:	"/reply $msg<br>"+
+								"  Replys to the last private<br>"+
+								"  message you received.<br>",
+				help_text:		"$msg:<br>"+
+								"  The message to be sent.<br>"+
+								"Example:<br>"+
+								"  /reply Hi<br>",
+			},
+			"roll": {
+				action: function(args) {
+					BroadcastRoll(args.join(' '));
+				},
+				description:	"/roll $roll $exp<br>"+
+								"  Rolls a variable number of<br>"+
+								"  dice and performes simple math<br>"+
+								"  on the result.<br>",
+				help_text:		"$roll: The actual roll. Writen<br>"+
+								"  as $Nd$S where $N is the<br>"+
+								"  number of dice to roll and $S<br>"+
+								"  is the number of sides each<br>"+
+								"  dice has.<br>"+
+								"$exp: A mathmatical expression<br>"+
+								"  to performe on the dice roll.<br>"+
+								"Example:<br>"+
+								"  /roll 2d6 + 10<br>"+
+								"Note:<br>"+
+								"  A roll can also be written as<br>"+
+								"  #(2d6 + 10)<br>"+
+								"Note:<br>"+
+								"  Does not support math with<br>"+
+								"  floating point numbers. This<br>"+
+								"  means any number containing a<br>"+
+								"  decimal.",
+
+			},
+			"tell": {
+				action: function(args) {
+					Tell(args.shift(), args.join(' '));
+				},
+				description:	"/tell $user $msg<br>"+
+								"  Sends a private message to a<br>"+
+								"  user.<br>",
+				help_text:		"$user: The user to send the<br>"+
+								"  message to.<br>"+
+								"$msg: The message to be sent.<br>"+
+								"Example:<br>"+
+								"  /tell John Hello<br>",
+			},
+			"template": {
+				action: function(args) {
+					BroadcastTemplate(args.join(' '));
+				},
+				description:	"/template $json<br>"+
+								"  Displays a templated chat<br>"+
+								"  message.<br>",
+				help_text:		"$json: A json object containing<br>"+
+								"  the content to display in the<br>"+
+								"  template table fields.<br>"+
+								"Example:<br>"+
+								"  /template {<br>"+
+								"    \"Skill\": \"Sneak\",<br>"+
+								"    \"Roll\": \"#(2d6 + 2)\"<br>"+
+								"  }<br>"+
+								"Note:<br>"+
+								"  You can type<br>"+
+								"  \'/help template example\' to<br>"+
+								"  display an example template<br>"+
+								"  command. Or you can type<br>"+
+								"  \'/help template title\' and<br>"+
+								"  \'/help template style\' to find<br>"+
+								"  out how to use these special<br>"+
+								"  content fields.<br>",
+				help_example:	"Example Template Command:<br>"+
+								"  Copy and paste this example<br>"+
+								"  template into the chat to try<br>"+
+								"  it out.<br><br>"+
+								"/template {<br>"+
+								"  \"title\": \"Test Template\",<br>"+
+								"  \"style\": {<br>"+
+								"    \"title_fg\": \"#BBCD67\",<br>"+
+								"    \"title_bg\": \"#445200\",<br>"+
+								"    \"fg\": \"#E8F6A4\",<br>"+
+								"    \"bg\": \"#91A437\",<br>"+
+								"    \"bg2\": \"#697B15\"<br>"+
+								"  },<br>"+
+								"  \"Key\": \"Value\",<br>"+
+								"  \"Skill\": \"Sneak\",<br>"+
+								"  \"Roll\": \"#(2d6+2)\"<br>"+
+								"}<br>",
+				help_title:		"/template $json<br>"+
+								"  Setting the template title<br>"+
+								"  field will change the title<br>"+
+								"  text that appears above the<br>"+
+								"  chat template.<br>"+
+								"Example:<br>"+
+								"  /template {<br>"+
+								"    \"title\": \"Skill Roll\"<br>"+
+								"  }<br>",
+				help_style:		"/template $json<br>"+
+								"  Setting the template style<br>"+
+								"  field will change the color<br>"+
+								"  of the chat template.<br>"+
+								"Example:<br>"+
+								"  /template {<br>"+
+								"    \"style\": {<br>"+
+								"      \"title_fg\": \"$color\",<br>"+
+								"      \"title_bg\": \"$color\",<br>"+
+								"      \"fg\": \"$color\",<br>"+
+								"      \"bg\": \"$color\",<br>"+
+								"      \"bg2\": \"$color\",<br>"+
+								"    }<br>"+
+								"  }<br>"+
+								"Note:<br>"+
+								"  title_fg: Sets the title text<br>"+
+								"    color.<br>"+
+								"  title_bg: Sets the title<br>"+
+								"    background color.<br>"+
+								"  fg: Sets the text color.<br>"+
+								"  bg: Sets the background color.<br>"+
+								"  bg2: Sets the alternating<br>"+
+								"    background color.<br>",
+			},
+			"user": {
+				action: function(args) {
+					DisplayUsername();
+				},
+				description:	"/user<br>"+
+								"  Displays your current alias.<br>",
+				help_text:		"",
+			},
+		};
 
 		var chat_log = _$.create("div", {
-			className: "cmf_chat_log",
+			className: "cmf-chat-log",
 		});
 		this.append(chat_log);
 		var chat_msg = _$.create("textarea", {
-			className: "cmf_chat_msg",
+			className: "cmf-chat-msg",
 		});
 		this.append(chat_msg);
 		var send_btn = _$.create("button", {
-			className: "cmf_btn",
+			className: "cmf-btn",
 			text: "Send",
 		});
 		this.append(send_btn);
@@ -56,14 +270,14 @@
 			if (packet.from != "server") {
 				Display(CreateMessageDiv(
 					"<b>" + packet.obj.as + ":</b><br>" + packet.obj.msg,
-					packet.obj.mod,
-					packet.obj.type
+					packet.obj.type,
+					packet.obj.mod
 				));						
 			} else {
 				Display(CreateMessageDiv(
 					packet.obj.msg,
-					packet.obj.mod, 
-					packet.obj.type
+					packet.obj.type,
+					packet.obj.mod 
 				));
 			}
 		});
@@ -74,8 +288,8 @@
 
 			Display(CreateMessageDiv(
 				"<b>" + packet.obj.as + ":</b><br>" + packet.obj.msg,
-				packet.obj.mod,
-				packet.obj.type
+				packet.obj.type,
+				packet.obj.mod
 			));
 		});
 
@@ -91,7 +305,36 @@
 			connected = false;
 		});
 
+		this.addClass(".cmf-chat");
 		ProcessCmd("help");
+
+		function ProcessCmd(msg)
+		{
+			var args = msg.split(' ');
+			var cmd = args[0];
+			args.shift();
+
+			if (cmd[0] == '/') {
+				Broadcast(msg, "cmf-tce-text");
+				return;
+			}
+
+			var unknown_cmd = true;
+			for (key in commands) {
+				if (commands.hasOwnProperty(key)) {
+					if (key == cmd) {
+						commands[key].action(args);
+						unknown_cmd = false;
+					}
+				}
+			}
+			if (unknown_cmd) {
+				DisplayError(
+					"Unknown command: \"" + cmd + "\"<br>" +
+					"Original command: \"/" + msg + "\""
+				);
+			}
+		}
 
 		function ParseMessage(msg) {
 			var div = _$.create("div");
@@ -113,7 +356,7 @@
 			return {
 				as: user.alias,
 				type: type,
-				mode: mod,
+				mod: mod,
 				msg: msg,
 			}
 		}
@@ -124,10 +367,10 @@
 				return;
 			}
 
-			type = type || "text";
+			type = type || "cmf-tce-text";
 			mod = mod || "";
 
-			var msg_div = CreateMessageDiv("", mod, type)
+			var msg_div = CreateMessageDiv("", type, mod)
 				.append(ParseMessage(str));
 
 			socket.emit("msg-obj-c2s", {
@@ -137,7 +380,8 @@
 
 			Display(msg_div.html(
 				"<b>" + user.alias + ":</b><br>" +
-				msg_div.html()));
+				msg_div.html()
+			));
 		}
 
 		function BroadcastRoll(str) {
@@ -146,18 +390,18 @@
 				return;
 			}
 
-			var msg_div = CreateMessageDiv("", "roll")
+			var msg_div = CreateMessageDiv("Rolling " + str + "...<br>", "cmf-tce-roll")
 				.append(CreateRollDiv(ComplexRoll(str)));
 
 			socket.emit("msg-obj-c2s", {
 				to:		"everyone",
-				obj:	ConstructMessage(msg_div.html(), "roll"),
+				obj:	ConstructMessage(msg_div.html(), "cmf-tce-roll"),
 			});
 
 			Display(msg_div.html(
 				"<b>" + user.alias + ":</b><br>" +
-				"Rolling " + str + "...<br>" +
-				msg_div.html()));
+				msg_div.html()
+			));
 		}
 
 		function BroadcastTemplate(msg) {
@@ -167,16 +411,16 @@
 			}
 
 			var msg_div = CreateTemplateDiv(msg);
-			// Display(msg_div, "roll");
 
 			socket.emit("msg-obj-c2s", {
 				to:		"everyone",
-				obj:	ConstructMessage(msg_div.html(), "roll"),
+				obj:	ConstructMessage(msg_div.html(), "cmf-tce-roll"),
 			});
 
 			Display(msg_div.html(
 				"<b>" + user.alias + ":</b><br>" +
-				msg_div.html()));
+				msg_div.html()
+			));
 		}
 
 		function Tell(to_user, str) {
@@ -195,15 +439,18 @@
 				DisplayWarning("User \'" + to_user + "\' is not connected.");
 				return;
 			} else {
-				var msg_div = CreateMessageDiv("", "tell")
+				var msg_div = CreateMessageDiv("", "cmf-tce-tell")
 					.append(ParseMessage(str));
 
 				socket.emit("pm-obj-c2s", {
 					to: 	user_id,
-					obj:	ConstructMessage(msg_div.html(), "tell"),
+					obj:	ConstructMessage(msg_div.html(), "cmf-tce-tell"),
 				});
 
-				Display(msg_div.html("<b>To " + to_user + ":</b><br>" + msg_div.html()));
+				Display(msg_div.html(
+					"<b>To " + to_user + ":</b><br>" +
+					msg_div.html()
+				));
 			}
 		}
 
@@ -229,70 +476,7 @@
 			if (msg[0] == '/')
 				ProcessCmd(msg.slice(1));
 			else
-				Broadcast(msg, "text");
-		}
-
-		function ProcessCmd(msg)
-		{
-			var args = msg.split(' ');
-			var cmd = args[0];
-			args.shift();
-
-			if (cmd[0] == '/') {
-				Broadcast(msg, "text");
-				return;
-			}
-
-			switch(cmd) {
-				case 'ro':
-				case "roll":
-					BroadcastRoll(args.join(' '));
-					break;
-				case "template":
-					BroadcastTemplate(args.join(' '));
-					break;
-				case 'c':
-				case "calc":
-					var msg = args.join(' ');
-					Broadcast(msg + " = " + cmf.MathParser(msg), "roll");
-					break;
-				case 't':
-				case "tell":
-					Tell(args.shift(), args.join(' '));
-					break;
-				case "r":
-				case "reply":
-					Reply(args.join(' '));
-					break;
-				case "clear":
-					chat_log.html("");
-					break;
-				case 'u':
-				case "user":
-					DisplayUsername();
-					break;
-				case 'h':
-				case "help":
-					DisplayInfo(
-						"Type \'/ro(ll) $xd$y\' to roll $x number of dice with $y number of sided dice.<br>" +
-						"Or Type \'#($expression)\', where $expression follows the roll syntax, anywhere in char.<br>" +
-						"Type \'/template {\"title\":\"title_value\",\"key\":\"key_value\"} \' to display a templated roll.<br>" +
-						"Type \'/c(alc) $expression\', where $expression is a mathmatical expression, to do simple calculations.<br>" +
-						"Type \'/t(ell) $username $message\' to send a PM to $username.<br>" +
-						"Type \'/r(eply) $message\' to reply to the last user you received a PM from.<br>" +
-						"Type \'/u(ser)\' to display your username.<br>" +
-						"Type \'/clear\' to clear the chat log.<br>" +
-						"Type \'/h(elp)\' to display this message again.<br>"
-					);
-					break;
-				default:
-					DisplayError(
-						"ERROR:<br>" +
-						"Unknown command: \"" + cmd + "\"<br>" +
-						"Original command: \"/" + msg + "\""
-					);
-					break;
-			}
+				Broadcast(msg, "cmf-tce-text");
 		}
 
 		function GetDieCritical(roll, sides) {
@@ -371,7 +555,7 @@
 				if (m != null) {
 					var roll = Roll(m[1], m[2]);
 					words[i] = roll.total;
-					complex_roll.tooltip.append(CreateMessageDiv(roll.total, GetRollCritical(roll), "die"));
+					complex_roll.tooltip.append(CreateMessageDiv(roll.total, "cmf-tce-die", GetRollCritical(roll)));
 				} else {
 					complex_roll.tooltip.html(complex_roll.tooltip.html() + words[i]);
 				}
@@ -379,15 +563,15 @@
 			
 			complex_roll.total = Math.floor(cmf.MathParser(words.join('')));
 			if (isNaN(complex_roll.total)) {
-				DisplayError("Error: Could not parse string<br>"+msg);
+				DisplayError("Could not parse string<br>"+msg);
 				return null;
 			}
 
 			return complex_roll;			
 		}
 
-		function CreateMessageDiv(html, modifier, type) {
-			type = type || "text";
+		function CreateMessageDiv(html, type, modifier) {
+			type = type || "cmf-tce-text";
 			modifier = modifier || "";
 
 			var div = _$.create("div", {
@@ -398,22 +582,15 @@
 		}
 
 		function CreateDieDiv(die) {
-			return CreateMessageDiv(die.total, die.modifier, "die");
+			return CreateMessageDiv(die.total, "cmf-tce-die", die.modifier);
 		}
 
 		function CreateRollDiv(roll) {
-			return CreateDieDiv(roll).append(roll.tooltip).addClass("cmf_tooltip");
+			return CreateDieDiv(roll).append(roll.tooltip).addClass("cmf-tooltip");
 		}
 
-		// function CreateComplexRollDiv(roll) {
-		// 	var div = CreateMessageDiv("Rolling...<br>", "roll")
-		// 		.append(CreateRollDiv(roll));
-
-		// 	return div;
-		// }
-
 		function CreateTemplateDiv(str) {
-			var div = CreateMessageDiv("", "roll");
+			var div = CreateMessageDiv("", "cmf-tce-roll");
 
 			var json = _$.extend({
 				style: {},
@@ -426,31 +603,34 @@
 				fg: "black",
 				bg: "white",
 				bg2: "#E5E4E2"
-			}, json.title);
+			}, json.style);
 
-			var tt = document.querySelector("#cmf_table_t");
-			var table = _$.get(document.importNode(tt.content, true));
-			var caption = table.select("caption").text(json.title)
+			var table = _$.create("table", {
+				className:	"cmf-chat-template",
+				align:		"center",
+			});
+			var caption = _$.create("caption").text(json.title)
 				.fg(json.style.title_fg).bg(json.style.title_bg);
-			var body = table.select("tbody").bd(json.style.title_bg);
+			var body = _$.create("tbody").bd(json.style.title_bg);
 
 			var alt = false;
-			var tr = document.querySelector("#cmf_row_t");
 			for (key in json) {
 				if (json.hasOwnProperty(key)) {
 					if (key == "title" || key == "style")
 						continue;
-					var row = _$.get(document.importNode(tr.content, true));
+					var row = _$.create("tr");
 					alt = !alt;
 					var bg = alt ? json.style.bg : json.style.bg2;
 					var val_div = ParseMessage(json[key]);
-					row.select("#c1").text(key)
+					var col1 = _$.create("td").text(key)
 						.fg(json.style.fg).bg(bg);
-					row.select("#c2").append(val_div)
+					var col2 = _$.create("td").append(val_div)
 						.fg(json.style.fg).bg(bg);
+					row.append(col1).append(col2);
 					body.append(row);
 				}
 			}
+			table.append(caption).append(body);
 			div.append(table);
 
 			return div;
@@ -462,24 +642,53 @@
 			chat_log[0].scrollTop = chat_log[0].scrollHeight;
 		}
 
-		// function DisplayMessage(html, mod) {
-		// 	mod = mod || "";
-		// 	Display(CreateMessageDiv(html, mod));
-		// }
-
 		function DisplayInfo(msg) {
-			var div = CreateMessageDiv(msg, "info");
+			var div = CreateMessageDiv(msg, "cmf-tce-text", "info");
 			Display(div);
 		}
 
 		function DisplayWarning(msg) {
-			var div = CreateMessageDiv(msg, "warning");
+			var div = CreateMessageDiv(msg, "cmf-tce-text", "warning");
 			Display(div);
 		}
 		
 		function DisplayError(msg) {
-			var div = CreateMessageDiv(msg, "err");
+			var div = CreateMessageDiv("<b>ERROR:</b><br>"+ msg, "cmf-tce-text", "err");
 			Display(div);
+		}
+
+		function DisplayHelp(args) {
+			var help_msg = "";
+			if (args.length == 0) {
+				for (key in commands) {
+					if (commands.hasOwnProperty(key)) {
+						help_msg += commands[key].description;
+					}
+				}
+			} else if (args[0] == "template" && args.length > 1) {
+				if (args[1] == "example") {
+					help_msg += commands["template"].help_example;
+				} else if (args[1] == "title") {
+					help_msg += commands["template"].help_title;
+				} else if (args[1] == "style") {
+					help_msg += commands["template"].help_style;
+				}
+			} else {
+				for (key in commands) {
+					if (commands.hasOwnProperty(key)) {
+						if (key == args[0]) {
+							help_msg = commands[key].description;
+							help_msg += commands[key].help_text;
+						}
+					}
+				}
+			}
+
+			if (help_msg == "") {
+				DisplayError("Unknown command " + args.join(' '));
+			} else {
+				DisplayInfo(help_msg);
+			}
 		}
 
 		function DisplayUsername() {
@@ -489,6 +698,6 @@
 				DisplayInfo("Logged in as \'" + user.name + "\'");
 		}
 
-		return this;
+		return commands;
 	}
 }(cmf));

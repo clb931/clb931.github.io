@@ -1,29 +1,44 @@
-if (typeof Array.prototype.indexOf !== "function") {
-	Array.prototype.indexOf = function(item) {
-		for(var i = 0; i < this.length; ++i)
-			if (this[i] === item)
-				return i;
-
-		return -1;
-	};
-}
-
-if (!Array.isArray) {
-	Array.isArray = function(arg) {
-		return Object.prototype.toString.call(arg) === '[object Array]';
-	};
-}
-
-window._$ = function(selector) {
-	return cmf.get(selector);
+function _$(selector) {
+	return cmf.init(selector);
 }
 
 window.cmf = (function() {
+	var readyCallbacks = [];
+	document.onreadystatechange = handleState;
+
+	if (typeof Array.prototype.indexOf !== "function") {
+		Array.prototype.indexOf = function(item) {
+			for (var i = 0; i < this.length; i++)
+				if (this[i] === item)
+					return i;
+			return -1;
+		};
+	}
+
+	if (!Array.isArray) {
+		Array.isArray = function(arg) {
+			return Object.prototype.toString.call(arg) === '[object Array]';
+		};
+	}
+
+	function handleState () {
+		if (['interactive', 'complete'].indexOf(document.readyState) > -1) {
+			while(readyCallbacks.length > 0) {
+				(readyCallbacks.shift())();
+			}
+		}
+	}
+
 	function CMF(els) {
 		for (var i = 0; i < els.length; ++i)
 			this[i] = els[i];
 		this.length = els.length;
 	}
+
+	CMF.prototype.ready = function(callback) {
+		readyCallbacks.push(callback);
+		handleState();
+	};
 
 	CMF.prototype.map = function(callback) {
 		var results = [];
@@ -31,20 +46,45 @@ window.cmf = (function() {
 			results.push(callback.call(this, this[i], i));
 
 		return results;
-	};
+	}
 
 	CMF.prototype.mapOne = function(callback) {
 		var m = this.map(callback);
 		return m.length > 1 ? m : m[0];
-	};
+	}
 
 	CMF.prototype.forEach = function(callback) {
 		this.map(callback);
 		return this;
+	}
+
+	CMF.prototype.select = function(selector, index) {
+		if (typeof index === "undefined") {
+			return cmf.init(this.mapOne(function(el) {
+				return el.querySelectorAll(selector);
+			}));
+		} else {
+			return cmf.init(this[0].querySelectorAll(selector)[index]);
+		}
+	}
+
+	CMF.prototype.get = function(index) {
+		index = index || 0;
+		return this[index];
 	};
 
-	CMF.prototype.select = function(selector) {
-		return cmf.get(this[0].querySelector(selector));
+	CMF.prototype.parent = function(index) {
+		return this.mapOne(function(el) {
+			if (el.parentNode)
+				return new CMF(el.parentNode);
+		});
+	};
+
+	CMF.prototype.children = function(index) {
+		return this.mapOne(function(el) {
+			if (el.hasChildNodes())
+				return new CMF(el.childNodes);
+		});
 	};
 
 	CMF.prototype.width = function(width) {
@@ -57,7 +97,7 @@ window.cmf = (function() {
 				return el.style.width;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.height = function(height) {
 		if (typeof height !== "undefined") {
@@ -69,7 +109,7 @@ window.cmf = (function() {
 				return el.style.height;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.text = function(text) {
 		if (typeof text !== "undefined") {
@@ -81,7 +121,7 @@ window.cmf = (function() {
 				return el.innerText;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.html = function(html) {
 		if (typeof html !== "undefined") {
@@ -93,7 +133,7 @@ window.cmf = (function() {
 				return el.innerHTML;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.value = function(value) {
 		if (typeof value !== "undefined") {
@@ -105,7 +145,7 @@ window.cmf = (function() {
 				return el.value;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.attr = function(attr, val) {
 		if (typeof val !== "undefined") {
@@ -117,12 +157,17 @@ window.cmf = (function() {
 				el.getAttribute(attr);
 			});
 		}
-	};
+	}
 
-	CMF.prototype.css = function() {
-		return this.mapOne(function(el) {
-			return el.style;
-		});
+	CMF.prototype.style = function(style, val) {
+		if (typeof val !== "undefined")
+			return this.forEach(function(el) {
+				el.style[style] = val;
+			});
+		else
+			return this.mapOne(function(el) {
+				return el.style[style];
+			});
 	};
 
 	CMF.prototype.fg = function(val) {
@@ -135,7 +180,7 @@ window.cmf = (function() {
 				el.style.color;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.bg = function(val) {
 		if (typeof val !== "undefined") {
@@ -147,7 +192,7 @@ window.cmf = (function() {
 				el.style.backgroundColor;
 			});
 		}
-	};
+	}
 
 	CMF.prototype.bd = function(val) {
 		if (typeof val !== "undefined") {
@@ -159,36 +204,35 @@ window.cmf = (function() {
 				el.style.borderColor;
 			});
 		}
-	};
+	}
+
+	CMF.prototype.hasClass = function(class_name) {
+		return this.forEach(function(el) {
+			var class_list = el.className.split(' ');
+			return (class_list.indexOf(class_name) != -1);
+		});
+	}
 
 	CMF.prototype.addClass = function(classes) {
 		var className = "";
 		if (typeof classes !== "string")
-			for (var i = 0; i < classes.length; ++i)
-				className += " " + classes[i];
+			className = classes.join(" ");
 		else
-			className = " " + classes;
+			className = classes;
 
 		return this.forEach(function (el) {
-			el.className += className;
+			el.className += " " + className;
 		});
-	};
-
-	CMF.prototype.hasClass = function(class_name) {
-		return this.forEach(function(el) {
-			var class_list = el.className.split(' '), i;
-			return (class_list.indexOf(class_name) != -1);
-		});
-	};
+	}
 
 	CMF.prototype.removeClass = function(class_name) {
 		return this.forEach(function(el) {
 			var class_list = el.className.split(' '), i;
 			while ((i = class_list.indexOf(class_name)) > -1)
-				class_list = class_list.slice(0, i).concat(cs.slice(++i));
+				class_list = class_list.slice(0, i).concat(class_list.slice(++i));
 			el.className = class_list.join(' ');
 		});
-	};
+	}
 
 	CMF.prototype.append = function(els) {
 		return this.forEach(function(parent, i) {
@@ -199,7 +243,7 @@ window.cmf = (function() {
 				parent.appendChild(child);
 			});
 		});
-	};
+	}
 
 	CMF.prototype.prepend = function(els) {
 		return this.forEach(function(parent, i) {
@@ -208,38 +252,59 @@ window.cmf = (function() {
 				parent.insertBefore(child, parent.firstChild);
 			}
 		});
-	};
+	}
 
 	CMF.prototype.remove = function() {
 		return this.forEach(function(el) {
-			return el.parentNode.removeChild(el);
+			if (el.parentNode)
+				return el.parentNode.removeChild(el);
 		});
-	};
+	}
 
 	CMF.prototype.show = function(style) {
 		style = style || "block";
 		return this.forEach(function(el) {
 			el.style.display = style;
 		});
-	};
+	}
 
 	CMF.prototype.hide = function() {
 		return this.forEach(function(el) {
 			el.style.display = "none";
 		});
-	};
+	}
 
 	CMF.prototype.enable = function() {
 		return this.forEach(function(el) {
 			el.disabled = false;
 		});
-	};
+	}
 
 	CMF.prototype.disable = function() {
 		return this.forEach(function(el) {
 			el.disabled = true;
 		});
-	};
+	}
+
+	CMF.prototype.fire = (function() {
+		if (document.createEvent) {
+			return function(e) {
+				evt = document.createEvent("HTMLEvents");
+				evt.initEvent(e, true, true);
+				return this.forEach(function(el) {
+					el.dispatchEvent(evt);
+				});
+			};
+		} else {
+			return function(e) {
+				evt = document.createEventObject();
+				evt.eventType = e;
+				return this.forEach(function(el) {
+					el.fireEvent("on" + evt.eventType, evt);
+				});
+			};
+		}
+	}());
 
 	CMF.prototype.on = (function() {
 		if (document.addEventListener) {
@@ -286,16 +351,29 @@ window.cmf = (function() {
 	}());
 
 	var cmf = {
+		about: {
+			name:			"CMF",
+			description:	"A jQuery style javasctipt library.",
+			version:		"0.0.1",
+			author:			"Caleb French", 
+		},
+
 		fn: CMF.prototype,
 
-		get: function(selector) {
+		init: function(selector) {
 			var els;
-			if (typeof selector === "string")
-				els = document.querySelectorAll(selector);
-			else if (selector.length)
+			if (typeof selector === "undefined") {
+				els = [document];
+			} else if (typeof selector === "string") {
+				if (selector == "__about__")
+					return cmf.about;
+				else 
+					els = document.querySelectorAll(selector);
+			} else if (selector.length) {
 				els = selector;
-			else
+			} else {
 				els = [selector];
+			}
 
 			return new CMF(els);
 		},
@@ -327,6 +405,18 @@ window.cmf = (function() {
 			return extended;
 		},
 	};
+
+	cmf.init(document).on("mousedown", function(evt) {
+		target = cmf.init(evt.currentTarget);
+		var move = function(e1) {
+			var onmousedrag = new MouseEvent("mousedrag", e1);
+			evt.target.dispatchEvent(onmousedrag);
+		};
+		target.on("mousemove", move);
+		target.on("mouseup", function() {
+			target.unhook("mousemove", move);
+		});
+	});
 
 	return cmf;
 }());

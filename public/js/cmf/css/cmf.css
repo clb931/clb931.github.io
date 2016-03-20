@@ -2,19 +2,33 @@ html {
 	height: 100%;
 }
 
-.cmf-def {
+.cmf-style-def {
 	background-color: #212121;
 	font-family: sans-serif;
 	font-size: 1rem;
 	color: white;
 }
 
-.cmf-frame {
+.cmf-style-def.cmf-widget-header li a {
+	font-weight: bold;
+	color: white;
+	padding: .5em;
+}
+
+.cmf-style-def.cmf-widget-header li a:hover {
+	color: #037E8C;
+}
+
+.cmf-style-def.cmf-widget-sizer {
+	background-color: silver;
+}
+
+.cmf-widget-frame {
 	width: 100%;
 	height: 100%;
 }
 
-.cmf-def.cmf-header {
+.cmf-style-def.cmf-widget-header {
 	background-color: #024959;
 	font-family: sans-serif;
 	font-size: 1.5rem;
@@ -27,11 +41,11 @@ html {
 	top: -1em;
 }
 
-.cmf-header ul {
+.cmf-widget-header ul {
 	margin-bottom: 0;
 }
 
-.cmf-header li {
+.cmf-widget-header li {
 	display: inline-block;
     padding: .5em;
 }
@@ -47,42 +61,28 @@ a:hover {
 	color: white;
 }
 
-.cmf-def.cmf-header li a {
-	font-weight: bold;
-	color: white;
-	padding: .5em;
-}
-
-.cmf-def.cmf-header li a:hover {
-	color: #037E8C;
-}
-
-.cmf-def.cmf-sizer {
-	background-color: silver;
-}
-
-.cmf-sizer, .cmf-pane {
+.cmf-widget-sizer, .cmf-widget-pane {
 	display: inline-block;
 }
 
-.cmf-sizer.cmf-horizontal {
+.cmf-widget-sizer.cmf-orient-ew {
 	cursor: ns-resize;
 	width: 100%;
 	height: 4px;
 }
 
-.cmf-sizer.cmf-vertical {
+.cmf-widget-sizer.cmf-orient-ns {
 	cursor: ew-resize;
 	height: 100%;
 	width: 4px;
 }
 
-.cmf-pane.cmf-horizontal {
+.cmf-widget-pane.cmf-orient-ew {
 	width: 100%;
 	height: 50%;
 }
 
-.cmf-pane.cmf-vertical {
+.cmf-widget-pane.cmf-orient-ns {
 	width: 50%;
 	height: 100%;
 }
@@ -98,52 +98,56 @@ a:hover {
 	overflow: auto;
 }
 
-.cmf_chat {
+.cmf-chat {
 	padding: 1em;
 	width: 100%;
 	height: 100%;
 	box-sizing: border-box;
 }
 
-.cmf_chat_log {
+.cmf-chat-log {
 	color: #212121;
 	background-color: #DEDEDE;
 	overflow: auto;
 	margin-bottom: 1em;
 	width: 100%;
 	height: 78%;
+	white-space: pre;
+	font-family: monospace;
 }
 
-.cmf_chat_msg {
+.cmf-chat-msg {
 	width: 100%;
 	height: 10%;
 }
-
-.text {
-	max-width: calc(100% - 1em);
-	padding: .5em;
-	margin: .5em;
-	color: black;
-	background-color: white;
+.cmf-tce-text, .cmf-tce-roll, .cmf-tce-tell {
+	display: inline-block;
 	border-bottom: 3px solid;
+	border-radius: 15px;
 	border-right: 3px solid;
 	box-sizing: border-box;
-	border-radius:.5em;
+	margin: .5em;
+	max-width: calc(100% - 1em);
+	padding: .5em;
 	word-wrap: break-word;
-	display: inline-block;
 }
 
-.text.info {
+.cmf-tce-text {
+	background-color: white;
+	color: black;	
+}
+
+.cmf-tce-text.info {
 	color: #4F8A10;
 	background-color: #DFF2BF;
 }
 
-.text.warning, .text.tell {
+.cmf-tce-text.warning, .cmf-tce-tell {
 	color: #9F6000;
 	background-color: #FEEFB3;
 }
 
-.text.err {
+.cmf-tce-text.err {
 	color: #D8000C;
 	background-color: #FFBABA;
 }
@@ -153,14 +157,14 @@ a:hover {
 	background-color: #BDE5F8;
 }*/
 
-.roll {
+.cmf-tce-roll {
 	color: #00529B;
 	background-color: #BDE5F8;
 	padding: .5em;
 	display: inline-block;
 }
 
-.die {
+.cmf-tce-die {
 	margin: .3em;
 	width: 2em;
 	color: black;
@@ -169,68 +173,63 @@ a:hover {
 	display: inline-block;
 	text-align: center;
 	vertical-align: middle;
-	border-radius:.5em;
+	border-radius: 5px;
 }
 
-.die.fail {
+.cmf-tce-die.fail {
 	color: #D8000C;
 	background-color: #FFBABA;
 }
 
-.die.crit {
+.cmf-tce-die.crit {
 	color: #4F8A10;
 	background-color: #DFF2BF;
 }
 
-.die.both {
+.cmf-tce-die.both {
 	color: #9F6000;
 	background-color: #FEEFB3;
 }
 
-.cmf_inline_roll {
-	background-color: #FEEFB3;	
-}
-
-table.cmf_roll_template {
+table.cmf-chat-template {
 	border-collapse: collapse;
 }
 
-table.cmf_roll_template caption {
+table.cmf-chat-template caption {
 	border-radius: 15px 15px 0 0;
 	padding: 0.25em 0.75em;
 	text-align: center;
 	white-space: pre;
 }
 
-table.cmf_roll_template tbody {
+table.cmf-chat-template tbody {
 	border: 2px solid;
 	border-radius: 0 0 15px 15px;
 	display: inline-block;
 }
 
-table.cmf_roll_template tbody tr:last-child  td:first-child {
+table.cmf-chat-template tbody tr:last-child  td:first-child {
 	border-radius: 0 0 0 15px;
 }
 
-table.cmf_roll_template tbody tr:last-child  td:last-child {
+table.cmf-chat-template tbody tr:last-child  td:last-child {
 	border-radius: 0 0 15px 0;
 }
 
-table.cmf_roll_template td, table.cmf_roll_template th {
+table.cmf-chat-template td, table.cmf_roll_template th {
 	padding: 0.25em 0.75em;
 }
 
-.cmf_tooltip {
+.cmf-tooltip {
 	position: relative;
 }
 
-.cmf_tooltip span {
+.cmf-tooltip span {
 	display: none;
 }
 
-.cmf_tooltip:hover span {
+.cmf-tooltip:hover span {
 	display: block;
-	/* position relative to container div.tooltip */
 	position: absolute;
 	bottom: 1em;
 	padding: 0.5em;
